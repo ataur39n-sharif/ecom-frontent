@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish DTAL Docker image
 
 on:
   push:
@@ -16,8 +16,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DTAL_DOCKER_USERNAME }}
+          password: ${{ secrets.DTAL_DOCKER_PASSWORD }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -33,17 +33,16 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  # update_ssh_linode:
-  #   name: Telling Linode Server to Update
-  #   needs: "push_to_registry"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: executing remote ssh commands using password
-  #       uses: appleboy/ssh-action@master
-  #       with:
-  #         host: ${{ secrets.HOST }}
-  #         username: ${{ secrets.USERNAME }}
-  #         password: ${{ secrets.PASSWORD }}
-  #         port: ${{ secrets.PORT }}
-  #         script: bash dream-furniture-frontend/update.sh
-
+  update_ssh_linode:
+    name: Telling Linode Server to Update
+    needs: "push_to_registry"
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DTAL_HOST }}
+          username: ${{ secrets.DTAL_USERNAME }}
+          password: ${{ secrets.DTAL_PASSWORD }}
+          port: ${{ secrets.DTAL_PORT }}
+          script: bash dream-furniture-frontend/update.sh
